@@ -38,7 +38,25 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # State Management
+  get: ^4.6.6
 
+  # Firebase
+  firebase_core: ^3.6.0
+  firebase_database: ^11.1.4
+  firebase_auth: ^5.3.1
+
+  # UI
+  flutter_screenutil: ^5.9.3
+  google_fonts: ^6.2.1
+
+  # Icons
+  cupertino_icons: ^1.0.8
+  font_awesome_flutter: ^10.7.0
+
+  # Utils
+  intl: ^0.19.0
+  email_validator: ^2.1.17
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
