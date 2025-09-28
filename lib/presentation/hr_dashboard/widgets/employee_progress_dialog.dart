@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../data/models/user_model.dart';
-import 'package:onboardingapp/data/models/task_model.dart';
+import '../../../data/models/task_model.dart';
 import '../../../data/models/task_with_user_task.dart';
 import '../../../data/repositories/user_task_repository.dart';
 import '../hr_dashboard_controller.dart';
@@ -70,7 +70,7 @@ class EmployeeProgressDialog extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => _showAddTaskDialog(context),
+                    onPressed: _showAddTaskDialog,
                     icon: const Icon(Icons.add),
                   ),
                 ],
@@ -200,12 +200,12 @@ class EmployeeProgressDialog extends StatelessWidget {
             ),
             if (!task.isDefault) ...[
               IconButton(
-                onPressed: () => _showEditTaskDialog(context, task),
+                onPressed: () => _showEditTaskDialog(task),
                 icon: const FaIcon(FontAwesomeIcons.pencil, size: 14),
                 color: AppColors.primary,
               ),
               IconButton(
-                onPressed: () => _showDeleteTaskDialog(context, task),
+                onPressed: () => _showDeleteTaskDialog(task),
                 icon: const FaIcon(FontAwesomeIcons.trash, size: 14),
                 color: AppColors.error,
               ),
@@ -216,13 +216,13 @@ class EmployeeProgressDialog extends StatelessWidget {
     );
   }
 
-  void _showAddTaskDialog(BuildContext context) {
+  // FIXED: Remove context parameter, use Get.dialog instead
+  void _showAddTaskDialog() {
     final controller = TextEditingController();
     final hrController = Get.find<HRDashboardController>();
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         title: Text('Thêm task riêng cho ${employee.name}'),
         content: TextField(
           controller: controller,
@@ -249,13 +249,13 @@ class EmployeeProgressDialog extends StatelessWidget {
     );
   }
 
-  void _showEditTaskDialog(BuildContext context, TaskModel task) {
+  // FIXED: Remove context parameter, use Get.dialog instead
+  void _showEditTaskDialog(TaskModel task) {
     final controller = TextEditingController(text: task.name);
     final hrController = Get.find<HRDashboardController>();
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         title: const Text('Sửa task'),
         content: TextField(
           controller: controller,
@@ -282,12 +282,12 @@ class EmployeeProgressDialog extends StatelessWidget {
     );
   }
 
-  void _showDeleteTaskDialog(BuildContext context, TaskModel task) {
+  // FIXED: Remove context parameter, use Get.dialog instead
+  void _showDeleteTaskDialog(TaskModel task) {
     final hrController = Get.find<HRDashboardController>();
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         title: const Text('Xác nhận xóa'),
         content: Text('Bạn có chắc chắn muốn xóa task "${task.name}"?'),
         actions: [

@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'task_management_controller.dart';
-import 'package:onboardingapp/data/models/task_model.dart';
+import '../../data/models/task_model.dart';
 import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
 
@@ -27,7 +27,7 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddTaskDialog(context),
+        onPressed: _showAddTaskDialog,
         icon: const Icon(Icons.add),
         label: const Text('Thêm task'),
       ),
@@ -155,13 +155,13 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed: () => _showEditTaskDialog(context, task),
+                  onPressed: () => _showEditTaskDialog(task),
                   icon: const FaIcon(FontAwesomeIcons.pencil),
                   color: AppColors.primary,
                   iconSize: 16.sp,
                 ),
                 IconButton(
-                  onPressed: () => _showDeleteConfirmation(context, task),
+                  onPressed: () => _showDeleteConfirmation(task),
                   icon: const FaIcon(FontAwesomeIcons.trash),
                   color: AppColors.error,
                   iconSize: 16.sp,
@@ -174,12 +174,12 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
     );
   }
 
-  void _showAddTaskDialog(BuildContext context) {
+  // FIXED: Remove context parameter, use Get.dialog instead
+  void _showAddTaskDialog() {
     final textController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         title: const Text('Thêm Task mới'),
         content: TextField(
           controller: textController,
@@ -206,12 +206,12 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
     );
   }
 
-  void _showEditTaskDialog(BuildContext context, TaskModel task) {
+  // FIXED: Remove context parameter, use Get.dialog instead
+  void _showEditTaskDialog(TaskModel task) {
     final textController = TextEditingController(text: task.name);
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+    Get.dialog(
+      AlertDialog(
         title: const Text('Sửa Task'),
         content: TextField(
           controller: textController,
@@ -239,10 +239,10 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, TaskModel task) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+  // FIXED: Remove context parameter, use Get.dialog instead
+  void _showDeleteConfirmation(TaskModel task) {
+    Get.dialog(
+      AlertDialog(
         title: const Text('Xác nhận xóa'),
         content: Text('Bạn có chắc chắn muốn xóa task "${task.name}"?'),
         actions: [
