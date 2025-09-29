@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../data/models/task_with_user_task.dart';
-import '../../../core/themes/app_colors.dart';
 import '../../../core/themes/text_styles.dart';
 
 class TaskItem extends StatelessWidget {
@@ -18,19 +17,31 @@ class TaskItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final task = taskWithUserTask.task;
     final userTask = taskWithUserTask.userTask;
+    final completed = userTask.completed;
 
-    return Card(
-      color: userTask.completed
-          ? AppColors.success.withOpacity(0.1)
-          : AppColors.surface,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: Colors.blue.shade50,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: completed ? Colors.lightBlue.shade600 : Colors.transparent,
+          width: 1.5,
+        ),
+      ),
       child: Padding(
         padding: EdgeInsets.all(12.w),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Checkbox(
-              value: userTask.completed,
+              value: completed,
               onChanged: onChanged,
-              activeColor: AppColors.success,
+              activeColor: Colors.lightBlue.shade600,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.r),
+              ),
             ),
             SizedBox(width: 8.w),
             Expanded(
@@ -40,28 +51,28 @@ class TaskItem extends StatelessWidget {
                   Text(
                     task.name,
                     style: AppTextStyles.bodyLarge.copyWith(
-                      color: userTask.completed ? AppColors.grey : AppColors.onSurface,
-                      decoration: userTask.completed
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
+                      color: completed
+                          ? Colors.lightBlue.shade700
+                          : Colors.blueGrey.shade900,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (!task.isDefault) ...[
+                  if (!task.isDefault)
                     Text(
                       'Task riêng',
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.secondary,
+                        color: Colors.lightBlue.shade700,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
-                  ],
-                  if (userTask.completed && userTask.completedDate.isNotEmpty) ...[
+                  if (completed && userTask.completedDate.isNotEmpty)
                     Text(
                       'Hoàn thành: ${userTask.completedDate}',
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.success,
+                        color: Colors.lightBlue.shade600,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ],
                 ],
               ),
             ),
