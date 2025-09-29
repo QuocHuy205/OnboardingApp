@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../../presentation/login/login_screen.dart';
+import '../../presentation/login/login_controller.dart'; // THÊM IMPORT NÀY
 import '../../presentation/hr_dashboard/hr_dashboard_screen.dart';
 import '../../presentation/hr_dashboard/hr_dashboard_controller.dart';
 import '../../presentation/employee_dashboard/employee_dashboard_screen.dart';
@@ -14,7 +15,7 @@ class AppRoutes {
       name: RouteConstants.login,
       page: () => const LoginScreen(),
       binding: BindingsBuilder(() {
-        Get.toNamed(RouteConstants.login);
+        Get.lazyPut(() => LoginController());
       }),
     ),
     GetPage(
