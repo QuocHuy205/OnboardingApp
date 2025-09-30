@@ -23,10 +23,17 @@ class TaskItem extends StatelessWidget {
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF26C6DA).withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
         border: Border.all(
-          color: completed ? Colors.lightBlue.shade600 : Colors.transparent,
+          color: completed ? const Color(0xFF26C6DA) : Colors.transparent,
           width: 1.5,
         ),
       ),
@@ -38,7 +45,7 @@ class TaskItem extends StatelessWidget {
             Checkbox(
               value: completed,
               onChanged: onChanged,
-              activeColor: Colors.lightBlue.shade600,
+              activeColor: const Color(0xFF26C6DA),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4.r),
               ),
@@ -51,17 +58,17 @@ class TaskItem extends StatelessWidget {
                   Text(
                     task.name,
                     style: AppTextStyles.bodyLarge.copyWith(
-                      color: completed
-                          ? Colors.lightBlue.shade700
-                          : Colors.blueGrey.shade900,
+                      color: completed ? const Color(0xFF26C6DA) : const Color(0xFF757575),
+
                       fontWeight: FontWeight.w600,
                     ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                   if (!task.isDefault)
                     Text(
                       'Task riêng',
                       style: AppTextStyles.caption.copyWith(
-                        color: Colors.lightBlue.shade700,
+                        color: const Color(0xFF757575),
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -69,7 +76,7 @@ class TaskItem extends StatelessWidget {
                     Text(
                       'Hoàn thành: ${userTask.completedDate}',
                       style: AppTextStyles.caption.copyWith(
-                        color: Colors.lightBlue.shade600,
+                        color: Colors.grey[600],
                         fontWeight: FontWeight.w500,
                       ),
                     ),

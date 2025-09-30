@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:onboardingapp/core/themes/app_colors.dart';
-import 'package:onboardingapp/core/themes/text_styles.dart';
-import 'package:onboardingapp/core/widgets/custom_button.dart';
-import 'package:onboardingapp/core/widgets/custom_text_field.dart';
 
 class AddEmployeeDialog extends StatelessWidget {
   final Function(String name, String email) onConfirm;
@@ -30,6 +26,9 @@ class AddEmployeeDialog extends StatelessWidget {
       ),
       child: Container(
         padding: EdgeInsets.all(24.w),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
         child: Form(
           key: formKey,
           child: Column(
@@ -39,16 +38,27 @@ class AddEmployeeDialog extends StatelessWidget {
               // Header
               Row(
                 children: [
-                  Icon(
-                    Icons.person_add,
-                    color: AppColors.primary,
-                    size: 24.sp,
+                  Container(
+                    padding: EdgeInsets.all(8.w),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                      ),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Icon(
+                      Icons.person_add,
+                      color: Colors.white,
+                      size: 20.sp,
+                    ),
                   ),
-                  SizedBox(width: 8.w),
+                  SizedBox(width: 12.w),
                   Text(
                     'Thêm nhân viên mới',
-                    style: AppTextStyles.heading3.copyWith(
+                    style: TextStyle(
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.bold,
+                      color: const Color(0xFF00838F),
                     ),
                   ),
                 ],
@@ -56,10 +66,20 @@ class AddEmployeeDialog extends StatelessWidget {
               SizedBox(height: 24.h),
 
               // Name Field
-              CustomTextField(
+              TextFormField(
                 controller: nameController,
-                labelText: 'Họ tên',
-                prefixIcon: const Icon(Icons.person),
+                enabled: !isLoading,
+                decoration: InputDecoration(
+                  labelText: 'Họ tên',
+                  prefixIcon: const Icon(Icons.person, color: Color(0xFF26C6DA)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập họ tên';
@@ -69,16 +89,25 @@ class AddEmployeeDialog extends StatelessWidget {
                   }
                   return null;
                 },
-                enabled: !isLoading,
               ),
               SizedBox(height: 16.h),
 
               // Email Field
-              CustomTextField(
+              TextFormField(
                 controller: emailController,
-                labelText: 'Email',
-                prefixIcon: const Icon(Icons.email),
+                enabled: !isLoading,
                 keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: const Icon(Icons.email, color: Color(0xFF26C6DA)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Vui lòng nhập email';
@@ -88,12 +117,11 @@ class AddEmployeeDialog extends StatelessWidget {
                   }
                   return null;
                 },
-                enabled: !isLoading,
               ),
               SizedBox(height: 24.h),
 
               // Loading indicator
-              if (isLoading) ...[
+              if (isLoading)
                 Center(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -101,18 +129,23 @@ class AddEmployeeDialog extends StatelessWidget {
                       SizedBox(
                         width: 20.w,
                         height: 20.h,
-                        child: const CircularProgressIndicator(strokeWidth: 2),
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF26C6DA)),
+                        ),
                       ),
                       SizedBox(width: 12.w),
                       Text(
                         'Đang thêm nhân viên...',
-                        style: AppTextStyles.bodyMedium,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: const Color(0xFF00838F),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                SizedBox(height: 16.h),
-              ],
+              if (isLoading) SizedBox(height: 16.h),
 
               // Action Buttons
               Row(
@@ -121,29 +154,62 @@ class AddEmployeeDialog extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: isLoading ? null : onCancel,
                       style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        padding: EdgeInsets.symmetric(vertical: 14.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
+                        side: BorderSide(
+                          color: isLoading ? Colors.grey[300]! : const Color(0xFF26C6DA),
+                        ),
                       ),
-                      child: const Text('Hủy'),
+                      child: Text(
+                        'Hủy',
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          color: isLoading ? Colors.grey[400] : const Color(0xFF26C6DA),
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(width: 12.w),
                   Expanded(
-                    child: CustomButton(
-                      text: 'Thêm',
-                      isLoading: isLoading,
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                        if (formKey.currentState?.validate() ?? false) {
-                          onConfirm(
-                            nameController.text.trim(),
-                            emailController.text.trim(),
-                          );
-                        }
-                      },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: isLoading
+                            ? null
+                            : const LinearGradient(
+                          colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                        ),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: ElevatedButton(
+                        onPressed: isLoading
+                            ? null
+                            : () {
+                          if (formKey.currentState?.validate() ?? false) {
+                            onConfirm(
+                              nameController.text.trim(),
+                              emailController.text.trim(),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isLoading ? Colors.grey[300] : Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        child: Text(
+                          'Thêm',
+                          style: TextStyle(
+                            fontSize: 15.sp,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],

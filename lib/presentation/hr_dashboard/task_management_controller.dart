@@ -8,7 +8,6 @@ import 'package:onboardingapp/data/repositories/task_repository.dart';
 class TaskManagementController extends GetxController {
   final TaskRepository _taskRepository = Get.find();
 
-  // Observable variables
   final defaultTasks = <TaskModel>[].obs;
   final isLoading = false.obs;
   final editingTask = Rxn<TaskModel>();
@@ -32,7 +31,7 @@ class TaskManagementController extends GetxController {
   void _loadDefaultTasks() {
     _tasksSubscription = _taskRepository.getDefaultTasksStream().listen(
           (tasksList) {
-        defaultTasks.value = tasksList;
+        defaultTasks.assignAll(tasksList); // ensure reactive update
       },
       onError: (error) {
         Get.snackbar('Lỗi', 'Không thể tải tasks: $error');
@@ -47,7 +46,9 @@ class TaskManagementController extends GetxController {
     }
 
     try {
-      await _taskRepository.createTask(name, isDefault, hrUser.id);
+      final newTask = await _taskRepository.createTask(name, isDefault, hrUser.id);
+      // thêm trực tiếp vào list để UI rebuild ngay
+      defaultTasks.add(newTask);
       Get.snackbar('Thành công', 'Đã tạo task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
@@ -57,6 +58,14 @@ class TaskManagementController extends GetxController {
   Future<void> updateTask(TaskModel task) async {
     try {
       await _taskRepository.updateTask(task);
+
+      // cập nhật trực tiếp trong list để UI rebuild
+      final index = defaultTasks.indexWhere((t) => t.id == task.id);
+      if (index != -1) {
+        defaultTasks[index] = task;
+        defaultTasks.refresh();
+      }
+
       Get.snackbar('Thành công', 'Đã cập nhật task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
@@ -66,6 +75,7 @@ class TaskManagementController extends GetxController {
   Future<void> deleteTask(String taskId) async {
     try {
       await _taskRepository.deleteTask(taskId);
+      defaultTasks.removeWhere((t) => t.id == taskId);
       Get.snackbar('Thành công', 'Đã xóa task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));

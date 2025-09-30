@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'hr_dashboard_controller.dart';
 import 'widgets/employee_card.dart';
 import 'widgets/employee_progress_dialog.dart';
 import 'package:onboardingapp/data/models/user_model.dart';
-import '../../core/themes/app_colors.dart';
-import '../../core/themes/text_styles.dart';
 
 class HRDashboardScreen extends GetView<HRDashboardController> {
   const HRDashboardScreen({super.key});
@@ -15,57 +12,225 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'TodoList HR',
-              style: AppTextStyles.heading3.copyWith(
-                color: AppColors.onPrimary,
-              ),
-            ),
-            Text(
-              'Xin chào, ${controller.hrUser.name}',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.onPrimary.withOpacity(0.8),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            onPressed: controller.navigateToTaskManagement,
-            icon: const FaIcon(FontAwesomeIcons.gear),
-            tooltip: 'Quản lý Tasks',
+      backgroundColor: const Color(0xFFF5F9FA),
+      appBar: _buildAppBar(),
+      floatingActionButton: _buildFAB(),
+      body: Column(
+        children: [
+          _buildHeaderCard(),
+          Expanded(
+            child: Obx(() => controller.employees.isEmpty
+                ? _buildEmptyState()
+                : _buildEmployeesList()),
           ),
-          SizedBox(width: 8.w),
-          OutlinedButton(
-            onPressed: controller.logout,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.onPrimary,
-              side: const BorderSide(color: AppColors.onPrimary),
+        ],
+      ),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+          ),
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20.r),
+          ),
+        ),
+      ),
+      title: Row(
+        children: [
+          CircleAvatar(
+            radius: 18.r,
+            backgroundColor: Colors.white,
+            child: Text(
+              controller.hrUser.name.isNotEmpty
+                  ? controller.hrUser.name[0].toUpperCase()
+                  : 'H',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF26C6DA),
+              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const FaIcon(FontAwesomeIcons.rightFromBracket, size: 14),
-                SizedBox(width: 4.w),
-                const Text('Đăng xuất'),
+                Text(
+                  'Xin chào, ${controller.hrUser.name}',
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'TodoList',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
               ],
             ),
           ),
-          SizedBox(width: 16.w),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddEmployeeDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Thêm nhân viên'),
+      actions: [
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 4.w),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: IconButton(
+            onPressed: controller.navigateToTaskManagement,
+            icon: const Icon(Icons.settings, color: Colors.white),
+            tooltip: 'Quản lý Tasks',
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(right: 12.w, top: 8.h, bottom: 8.h),
+          child: OutlinedButton.icon(
+            onPressed: controller.logout,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: const BorderSide(color: Colors.white, width: 1.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            ),
+            icon: const Icon(Icons.logout, size: 18),
+            label: const Text('Đăng xuất'),
+          ),
+        ),
+      ],
+    );
+  }
+
+
+  Widget _buildHeaderCard() {
+    return Container(
+      margin: EdgeInsets.all(16.w),
+      padding: EdgeInsets.all(20.w),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF26C6DA).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
-      body: Obx(() => controller.employees.isEmpty
-          ? _buildEmptyState()
-          : _buildEmployeesList()),
+      child: Row(
+        children: [
+          Container(
+            width: 56.w,
+            height: 56.h,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.people,
+              size: 28.sp,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(width: 16.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tổng nhân viên',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Obx(() => Text(
+                  '${controller.employees.length}',
+                  style: TextStyle(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                )),
+              ],
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.trending_up, size: 16.sp, color: Colors.white),
+                SizedBox(width: 4.w),
+                Text(
+                  'Hoạt động',
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFAB() {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16.r),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF26C6DA).withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: FloatingActionButton.extended(
+        onPressed: () => _showAddEmployeeDialog(Get.context!),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        icon: const Icon(Icons.person_add, color: Colors.white),
+        label: Text(
+          'Thêm nhân viên',
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 
@@ -74,20 +239,35 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FaIcon(
-            FontAwesomeIcons.users,
-            size: 64.sp,
-            color: AppColors.grey,
+          Container(
+            width: 120.w,
+            height: 120.h,
+            decoration: BoxDecoration(
+              color: const Color(0xFF4DD0E1).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.people_outline,
+              size: 60.sp,
+              color: const Color(0xFF26C6DA),
+            ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 24.h),
           Text(
             'Chưa có nhân viên nào',
-            style: AppTextStyles.heading3.copyWith(color: AppColors.grey),
+            style: TextStyle(
+              fontSize: 18.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF00838F),
+            ),
           ),
           SizedBox(height: 8.h),
           Text(
             'Thêm nhân viên đầu tiên để bắt đầu',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.grey),
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey[600],
+            ),
           ),
         ],
       ),
@@ -96,18 +276,147 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
 
   Widget _buildEmployeesList() {
     return ListView.separated(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 80.h),
       itemCount: controller.employees.length,
       separatorBuilder: (context, index) => SizedBox(height: 12.h),
       itemBuilder: (context, index) {
         final employee = controller.employees[index];
-        return EmployeeCard(
-          employee: employee,
-          onTap: () => _showEmployeeProgressDialog(context, employee),
-          onEdit: () => _showEditEmployeeDialog(context, employee),
-          onDelete: () => _showDeleteConfirmation(context, employee),
-        );
+        return _buildEmployeeCard(employee);
       },
+    );
+  }
+
+  Widget _buildEmployeeCard(UserModel employee) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF26C6DA).withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showEmployeeProgressDialog(Get.context!, employee),
+          borderRadius: BorderRadius.circular(16.r),
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Row(
+              children: [
+                Container(
+                  width: 56.w,
+                  height: 56.h,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      employee.name[0].toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        employee.name,
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF00838F),
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.email_outlined,
+                            size: 14.sp,
+                            color: Colors.grey[600],
+                          ),
+                          SizedBox(width: 4.w),
+                          Expanded(
+                            child: Text(
+                              employee.email,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Colors.grey[600],
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 14.sp,
+                            color: Colors.grey[600],
+                          ),
+                          SizedBox(width: 4.w),
+                          Text(
+                            'Bắt đầu: ${employee.startDate}',
+                            style: TextStyle(
+                              fontSize: 12.sp,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4DD0E1).withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () => _showEditEmployeeDialog(Get.context!, employee),
+                        icon: const Icon(Icons.edit),
+                        color: const Color(0xFF26C6DA),
+                        iconSize: 20.sp,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red[50],
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: () => _showDeleteConfirmation(Get.context!, employee),
+                        icon: const Icon(Icons.delete_outline),
+                        color: Colors.red[400],
+                        iconSize: 20.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -118,23 +427,53 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Thêm nhân viên mới'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                ),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(Icons.person_add, color: Colors.white, size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
+            const Text('Thêm nhân viên mới'),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Họ tên',
-                prefixIcon: Icon(Icons.person),
+                prefixIcon: const Icon(Icons.person, color: Color(0xFF26C6DA)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                ),
               ),
             ),
             SizedBox(height: 16.h),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: const Icon(Icons.email, color: Color(0xFF26C6DA)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                ),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -149,17 +488,23 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
             onPressed: controller.isLoading.value
                 ? null
                 : () {
-              controller.addEmployee(
-                nameController.text,
-                emailController.text,
-              );
+              controller.addEmployee(nameController.text, emailController.text);
               Get.back();
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF26C6DA),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+            ),
             child: controller.isLoading.value
-                ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+                ? SizedBox(
+              width: 20.w,
+              height: 20.h,
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
             )
                 : const Text('Thêm'),
           )),
@@ -175,23 +520,49 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sửa thông tin nhân viên'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                ),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(Icons.edit, color: Colors.white, size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
+            const Text('Sửa thông tin'),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Họ tên',
-                prefixIcon: Icon(Icons.person),
+                prefixIcon: const Icon(Icons.person, color: Color(0xFF26C6DA)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                ),
               ),
             ),
             SizedBox(height: 16.h),
             TextField(
               controller: emailController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: const Icon(Icons.email, color: Color(0xFF26C6DA)),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                ),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
@@ -206,18 +577,21 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
             onPressed: controller.isLoading.value
                 ? null
                 : () {
-              controller.updateEmployee(
-                employee.id,
-                nameController.text,
-                emailController.text,
-              );
+              controller.updateEmployee(employee.id, nameController.text, emailController.text);
               Get.back();
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF26C6DA),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+            ),
             child: controller.isLoading.value
-                ? const SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
+                ? SizedBox(
+              width: 20.w,
+              height: 20.h,
+              child: const CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
             )
                 : const Text('Cập nhật'),
           )),
@@ -230,10 +604,23 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(8.w),
+              decoration: BoxDecoration(
+                color: Colors.red[100],
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(Icons.warning, color: Colors.red[700], size: 20.sp),
+            ),
+            SizedBox(width: 12.w),
+            const Text('Xác nhận xóa'),
+          ],
+        ),
         content: Text(
-          'Bạn có chắc chắn muốn xóa nhân viên ${employee.name}? '
-              'Tất cả dữ liệu liên quan sẽ bị xóa.',
+          'Bạn có chắc chắn muốn xóa nhân viên ${employee.name}? Tất cả dữ liệu liên quan sẽ bị xóa.',
         ),
         actions: [
           TextButton(
@@ -246,7 +633,8 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
               Get.back();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: Colors.red[400],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
             ),
             child: const Text('Xóa'),
           ),

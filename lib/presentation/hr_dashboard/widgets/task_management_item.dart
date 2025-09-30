@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:onboardingapp/core/themes/app_colors.dart';
-import 'package:onboardingapp/core/themes/text_styles.dart';
-import 'package:onboardingapp/data/models/task_model.dart';
+import '../../../data/models/task_model.dart';
 
 class TaskManagementItem extends StatelessWidget {
   final TaskModel task;
@@ -21,64 +18,89 @@ class TaskManagementItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.r),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF26C6DA).withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Container(
+      child: Padding(
         padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
             // Task Icon
             Container(
-              width: 40.w,
-              height: 40.h,
+              width: 48.w,
+              height: 48.h,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                ),
+                borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(
-                FontAwesomeIcons.tasks,
-                color: AppColors.primary,
-                size: 16.sp,
+                Icons.task,
+                color: Colors.white,
+                size: 24.sp,
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 16.w),
 
-            // Task Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     task.name,
-                    style: AppTextStyles.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF00838F),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    'Tạo ngày: ${task.createdDate}',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.grey,
-                    ),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 12.sp,
+                        color: Colors.grey[600],
+                      ),
+                      SizedBox(width: 4.w),
+                      Text(
+                        'Tạo: ${task.createdDate}',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
                   if (!task.isDefault) ...[
-                    SizedBox(height: 2.h),
+                    SizedBox(height: 4.h),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 6.w,
+                        vertical: 2.h,
+                      ),
                       decoration: BoxDecoration(
-                        color: AppColors.secondary.withOpacity(0.2),
+                        color: const Color(0xFF26C6DA).withOpacity(0.2),
                         borderRadius: BorderRadius.circular(4.r),
                       ),
                       child: Text(
                         'Task riêng',
-                        style: AppTextStyles.caption.copyWith(
-                          color: AppColors.secondary,
-                          fontWeight: FontWeight.w500,
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: const Color(0xFF26C6DA),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -87,27 +109,42 @@ class TaskManagementItem extends StatelessWidget {
               ),
             ),
 
-            // Action Buttons
             if (isLoading) ...[
               SizedBox(
-                width: 20.w,
-                height: 20.h,
-                child: const CircularProgressIndicator(strokeWidth: 2),
+                width: 24.w,
+                height: 24.h,
+                child: const CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF26C6DA)),
+                ),
               ),
             ] else ...[
-              IconButton(
-                onPressed: onEdit,
-                icon: const FaIcon(FontAwesomeIcons.pencil),
-                color: AppColors.primary,
-                iconSize: 16.sp,
-                tooltip: 'Sửa task',
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF4DD0E1).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: onEdit,
+                  icon: const Icon(Icons.edit),
+                  color: const Color(0xFF26C6DA),
+                  iconSize: 20.sp,
+                  tooltip: 'Sửa task',
+                ),
               ),
-              IconButton(
-                onPressed: onDelete,
-                icon: const FaIcon(FontAwesomeIcons.trash),
-                color: AppColors.error,
-                iconSize: 16.sp,
-                tooltip: 'Xóa task',
+              SizedBox(width: 8.w),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(Icons.delete_outline),
+                  color: Colors.red[400],
+                  iconSize: 20.sp,
+                  tooltip: 'Xóa task',
+                ),
               ),
             ],
           ],

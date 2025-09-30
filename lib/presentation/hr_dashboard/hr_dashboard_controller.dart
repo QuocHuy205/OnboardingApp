@@ -2,8 +2,10 @@ import 'package:get/get.dart';
 import 'package:onboardingapp/core/constants/route_constants.dart';
 import 'package:onboardingapp/core/utils/validation_utils.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 
 import 'package:onboardingapp/data/models/task_model.dart';
+import 'package:onboardingapp/data/models/task_with_user_task.dart';
 import 'package:onboardingapp/data/models/user_model.dart';
 import 'package:onboardingapp/data/repositories/task_repository.dart';
 import 'package:onboardingapp/data/repositories/user_repository.dart';
@@ -14,10 +16,12 @@ class HRDashboardController extends GetxController {
   final UserTaskRepository _userTaskRepository = Get.find();
   final TaskRepository _taskRepository = Get.find();
 
-  // Observable variables
   final employees = <UserModel>[].obs;
   final isLoading = false.obs;
   late final UserModel hrUser;
+
+  final userTasks = <TaskWithUserTask>[].obs;
+  StreamSubscription<List<TaskWithUserTask>>? _tasksSubscription;
 
   StreamSubscription<List<UserModel>>? _employeesSubscription;
 
@@ -31,6 +35,7 @@ class HRDashboardController extends GetxController {
   @override
   void onClose() {
     _employeesSubscription?.cancel();
+    _tasksSubscription?.cancel();
     super.onClose();
   }
 
@@ -43,6 +48,43 @@ class HRDashboardController extends GetxController {
         Get.snackbar('Lỗi', 'Không thể tải danh sách nhân viên: $error');
       },
     );
+  }
+
+  void loadEmployeeTasks(String employeeId) {
+    _tasksSubscription?.cancel();
+    _tasksSubscription = _userTaskRepository
+        .getUserTasksWithDetailsStream(employeeId)
+        .listen(
+          (tasks) {
+        userTasks.assignAll(tasks);
+      },
+      onError: (e) {
+        Get.snackbar('Lỗi', 'Không thể tải tasks: $e');
+      },
+    );
+  }
+
+  Future<void> updateTaskStatus(String employeeId, String taskId, bool isCompleted) async {
+    try {
+      final index = userTasks.indexWhere((t) => t.task.id == taskId);
+      if (index != -1) {
+        final current = userTasks[index];
+        final updated = TaskWithUserTask(
+          task: current.task,
+          userTask: current.userTask.copyWith(
+            completed: isCompleted,
+            completedDate: isCompleted
+                ? DateFormat('dd/MM/yyyy').format(DateTime.now())
+                : '',
+          ),
+        );
+        userTasks[index] = updated;
+      }
+
+      await _userTaskRepository.updateTaskStatus(employeeId, taskId, isCompleted);
+    } catch (e) {
+      Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
+    }
   }
 
   Future<void> addEmployee(String name, String email) async {
@@ -110,7 +152,10 @@ class HRDashboardController extends GetxController {
     }
 
     try {
+      // tạo task mới
       await _userTaskRepository.createCustomUserTask(userId, taskName, hrUser.id);
+      // fetch lại danh sách tasks để cập nhật UI
+      loadEmployeeTasks(userId);
       Get.snackbar('Thành công', 'Đã thêm task riêng');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
@@ -126,6 +171,17 @@ class HRDashboardController extends GetxController {
     try {
       final updatedTask = task.copyWith(name: newName);
       await _taskRepository.updateTask(updatedTask);
+
+      // cập nhật list hiện tại
+      final index = userTasks.indexWhere((t) => t.task.id == task.id);
+      if (index != -1) {
+        userTasks[index] = TaskWithUserTask(
+          task: updatedTask,
+          userTask: userTasks[index].userTask,
+        );
+        userTasks.refresh();
+      }
+
       Get.snackbar('Thành công', 'Đã cập nhật task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
@@ -135,11 +191,13 @@ class HRDashboardController extends GetxController {
   Future<void> deleteCustomTask(String taskId, String userId) async {
     try {
       await _taskRepository.deleteCustomTaskForUser(taskId, userId);
+      userTasks.removeWhere((t) => t.task.id == taskId);
       Get.snackbar('Thành công', 'Đã xóa task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
   }
+
 
   void navigateToTaskManagement() {
     Get.toNamed(RouteConstants.taskManagement, arguments: hrUser);

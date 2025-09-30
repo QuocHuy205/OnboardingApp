@@ -44,20 +44,17 @@ class UserTaskRepository extends GetxService {
 
   // Get user tasks with details stream
   Stream<List<TaskWithUserTask>> getUserTasksWithDetailsStream(String userId) {
-    return _firebaseService.getAllTasksStream().asyncMap((allTasks) async {
-      try {
-        final userTasksSnapshot = await _firebaseService
-            .getUserTasksRef()
-            .child(userId)
-            .get();
-
+    return _firebaseService.getAllTasksStream().asyncExpand((allTasks) {
+      return _firebaseService.getUserTasksRef().child(userId).onValue.map((event) {
         final List<TaskWithUserTask> taskDetails = [];
 
-        if (userTasksSnapshot.exists) {
-          final userTasksData = userTasksSnapshot.value as Map<dynamic, dynamic>;
+        if (event.snapshot.exists) {
+          final userTasksData = event.snapshot.value as Map<dynamic, dynamic>;
 
           userTasksData.forEach((taskId, userTaskData) {
-            final userTask = UserTaskModel.fromMap(Map<String, dynamic>.from(userTaskData));
+            final userTask = UserTaskModel.fromMap(
+              Map<String, dynamic>.from(userTaskData),
+            );
             final task = allTasks.firstWhereOrNull((t) => t.id == userTask.taskId);
 
             if (task != null) {
@@ -66,7 +63,7 @@ class UserTaskRepository extends GetxService {
           });
         }
 
-        // Sort tasks: default tasks first, then by name
+        // sort
         taskDetails.sort((a, b) {
           if (a.task.isDefault && !b.task.isDefault) return -1;
           if (!a.task.isDefault && b.task.isDefault) return 1;
@@ -74,11 +71,10 @@ class UserTaskRepository extends GetxService {
         });
 
         return taskDetails;
-      } catch (e) {
-        return <TaskWithUserTask>[];
-      }
+      });
     });
   }
+
 
   // Update task status
   Future<void> updateTaskStatus(String userId, String taskId, bool isCompleted) async {

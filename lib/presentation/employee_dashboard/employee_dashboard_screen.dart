@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'employee_dashboard_controller.dart';
 import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
 import '../../core/utils/extensions.dart';
+import 'employee_dashboard_controller.dart';
 import 'widgets/task_item.dart';
 
 class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
@@ -19,7 +19,7 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.lightBlue.shade400, Colors.lightBlue.shade700],
+              colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -107,7 +107,7 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
           Text(
             'Danh sách công việc',
             style: AppTextStyles.heading3.copyWith(
-              color: Colors.blueGrey.shade800,
+              color: const Color(0xFF00838F),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -127,8 +127,9 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
     return Obx(
           () => Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        elevation: 3,
-        color: Colors.lightBlue.shade50,
+        elevation: 6,
+        color: Colors.white,
+        shadowColor: const Color(0xFF26C6DA).withOpacity(0.1),
         child: Padding(
           padding: EdgeInsets.all(20.w),
           child: Column(
@@ -142,13 +143,13 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
                       Text(
                         'Onboarding Checklist',
                         style: AppTextStyles.heading3.copyWith(
-                          color: Colors.blueGrey.shade900,
+                          color: const Color(0xFF00838F),
                         ),
                       ),
                       Text(
                         'Tiến độ hoàn thành',
                         style: AppTextStyles.bodyMedium.copyWith(
-                          color: Colors.grey,
+                          color: Colors.grey[600],
                         ),
                       ),
                     ],
@@ -158,7 +159,7 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
                     style: AppTextStyles.heading1.copyWith(
                       color: controller.isCompleted
                           ? Colors.green
-                          : Colors.lightBlue.shade600,
+                          : const Color(0xFF26C6DA),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -170,17 +171,16 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
                 child: LinearProgressIndicator(
                   minHeight: 10.h,
                   value: controller.progress,
-                  backgroundColor: Colors.blue.shade100,
+                  backgroundColor: const Color(0xFF4DD0E1).withOpacity(0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    controller.isCompleted ? Colors.green : Colors.lightBlue,
-                  ),
+                      controller.isCompleted ? Colors.green : const Color(0xFF26C6DA)),
                 ),
               ),
               SizedBox(height: 10.h),
               Text(
                 '${controller.completedCount}/${controller.totalCount} tasks hoàn thành',
                 style: AppTextStyles.bodyLarge.copyWith(
-                  color: Colors.blueGrey.shade700,
+                  color: Colors.grey[700],
                 ),
               ),
             ],
@@ -198,16 +198,14 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
         itemCount: controller.userTasks.length,
         separatorBuilder: (context, index) => SizedBox(height: 10.h),
         itemBuilder: (context, index) {
-          return Obx(() {
-            final taskWithUserTask = controller.userTasks[index];
-            return TaskItem(
-              taskWithUserTask: taskWithUserTask,
-              onChanged: (value) => controller.updateTaskStatus(
-                taskWithUserTask.task.id,
-                value ?? false,
-              ),
-            );
-          });
+          final taskWithUserTask = controller.userTasks[index];
+          return TaskItem(
+            taskWithUserTask: taskWithUserTask,
+            onChanged: (value) => controller.updateTaskStatus(
+              taskWithUserTask.task.id,
+              value ?? false,
+            ),
+          );
         },
       ),
     );
@@ -217,9 +215,10 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
     return Container(
       margin: EdgeInsets.only(top: 20.h),
       child: Card(
-        elevation: 3,
+        elevation: 6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-        color: Colors.green.shade50,
+        color: Colors.white,
+        shadowColor: const Color(0xFF26C6DA).withOpacity(0.1),
         child: Padding(
           padding: EdgeInsets.all(16.w),
           child: Row(

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../data/models/user_model.dart';
 import '../../../data/models/task_with_user_task.dart';
 import '../../../data/repositories/user_task_repository.dart';
-import '../../../core/themes/app_colors.dart';
-import '../../../core/themes/text_styles.dart';
-import '../../../core/utils/extensions.dart';
 
 class EmployeeCard extends StatelessWidget {
   final UserModel employee;
@@ -38,109 +34,186 @@ class EmployeeCard extends StatelessWidget {
           progress = completedTasks / totalTasks;
         }
 
-        return GestureDetector(
-          onTap: onTap,
-          child: Card(
-            child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      // Avatar
-                      CircleAvatar(
-                        radius: 28.r,
-                        backgroundColor: AppColors.primary.withOpacity(0.1),
-                        child: Text(
-                          employee.name.length >= 2
-                              ? employee.name.substring(0, 2).toUpperCase()
-                              : employee.name.toUpperCase(),
-                          style: AppTextStyles.heading3.copyWith(
-                            color: AppColors.primary,
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16.r),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF26C6DA).withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(16.r),
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // Avatar with gradient
+                        Container(
+                          width: 56.w,
+                          height: 56.h,
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              employee.name[0].toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(width: 12.w),
+                        SizedBox(width: 16.w),
 
-                      // Employee Info
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        // Employee Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                employee.name,
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF00838F),
+                                ),
+                              ),
+                              SizedBox(height: 4.h),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.email_outlined,
+                                    size: 14.sp,
+                                    color: Colors.grey[600],
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Expanded(
+                                    child: Text(
+                                      employee.email,
+                                      style: TextStyle(
+                                        fontSize: 13.sp,
+                                        color: Colors.grey[600],
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 2.h),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.calendar_today,
+                                    size: 14.sp,
+                                    color: Colors.grey[600],
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    'Bắt đầu: ${employee.startDate}',
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Progress percentage
+                        Column(
                           children: [
                             Text(
-                              employee.name,
-                              style: AppTextStyles.bodyLarge.copyWith(
-                                fontWeight: FontWeight.w600,
+                              '${(progress * 100).toInt()}%',
+                              style: TextStyle(
+                                fontSize: 24.sp,
+                                fontWeight: FontWeight.bold,
+                                color: progress == 1.0
+                                    ? const Color(0xFF4CAF50)
+                                    : const Color(0xFF26C6DA),
                               ),
                             ),
+                            SizedBox(height: 4.h),
                             Text(
-                              employee.email,
-                              style: AppTextStyles.bodyMedium.copyWith(
-                                color: AppColors.grey,
-                              ),
-                            ),
-                            Text(
-                              'Ngày bắt đầu: ${employee.startDate}',
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.grey,
+                              '$completedTasks/$totalTasks',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey[600],
                               ),
                             ),
                           ],
                         ),
-                      ),
-
-                      // Progress & Actions
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${progress.toPercentage}%',
-                            style: AppTextStyles.heading2.copyWith(
-                              color: progress == 1.0 ? AppColors.success : AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                onPressed: onEdit,
-                                icon: const FaIcon(FontAwesomeIcons.pencil),
-                                color: AppColors.primary,
-                                iconSize: 16.sp,
-                              ),
-                              IconButton(
-                                onPressed: onDelete,
-                                icon: const FaIcon(FontAwesomeIcons.trash),
-                                color: AppColors.error,
-                                iconSize: 16.sp,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
-
-                  // Progress Bar
-                  LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: AppColors.lightGrey,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      progress == 1.0 ? AppColors.success : AppColors.primary,
+                      ],
                     ),
-                  ),
-                  SizedBox(height: 8.h),
+                    SizedBox(height: 12.h),
 
-                  // Progress Text
-                  Text(
-                    '$completedTasks/$totalTasks tasks hoàn thành',
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: AppColors.grey,
+                    // Progress Bar
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 8.h,
+                        backgroundColor: Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          progress == 1.0
+                              ? const Color(0xFF4CAF50)
+                              : const Color(0xFF26C6DA),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                    SizedBox(height: 12.h),
+
+                    // Action buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4DD0E1).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: IconButton(
+                            onPressed: onEdit,
+                            icon: const Icon(Icons.edit),
+                            color: const Color(0xFF26C6DA),
+                            iconSize: 20.sp,
+                            tooltip: 'Chỉnh sửa',
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: IconButton(
+                            onPressed: onDelete,
+                            icon: const Icon(Icons.delete_outline),
+                            color: Colors.red[400],
+                            iconSize: 20.sp,
+                            tooltip: 'Xóa',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
