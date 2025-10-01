@@ -54,7 +54,7 @@ class AddEmployeeDialog extends StatelessWidget {
                   ),
                   SizedBox(width: 12.w),
                   Text(
-                    'Thêm nhân viên mới',
+                    'Thêm nhân viên',
                     style: TextStyle(
                       fontSize: 18.sp,
                       fontWeight: FontWeight.bold,

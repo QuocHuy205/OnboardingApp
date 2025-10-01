@@ -58,7 +58,7 @@ class EditEmployeeDialog extends StatelessWidget {
                   SizedBox(width: 12.w),
                   Expanded(
                     child: Text(
-                      'Sửa thông tin nhân viên',
+                      'Sửa thông tin',
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,

@@ -364,13 +364,15 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black87,
+            ),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: () {
               if (textController.text.isNotEmpty) {
                 controller.createTask(textController.text, true);
-                Get.back();
               }
             },
             style: ElevatedButton.styleFrom(
@@ -426,6 +428,9 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black87,
+            ),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
@@ -433,7 +438,6 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
               if (textController.text.isNotEmpty) {
                 final updatedTask = task.copyWith(name: textController.text);
                 controller.updateTask(updatedTask);
-                Get.back();
               }
             },
             style: ElevatedButton.styleFrom(
@@ -471,12 +475,14 @@ class TaskManagementScreen extends GetView<TaskManagementController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black87,
+            ),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: () {
               controller.deleteTask(task.id);
-              Get.back();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],

@@ -98,12 +98,11 @@ class HRDashboardController extends GetxController {
     try {
       final newEmployee = await _userRepository.createEmployee(name, email);
       await _userTaskRepository.createUserTasks(newEmployee.id);
-
-      Get.snackbar('Thành công', 'Thêm nhân viên thành công');
-    } catch (e) {
-      Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
-    } finally {
+      Get.back();
       isLoading.value = false;
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
   }
 
@@ -124,20 +123,21 @@ class HRDashboardController extends GetxController {
       );
 
       await _userRepository.updateEmployee(oldId, updatedEmployee);
-      Get.snackbar('Thành công', 'Cập nhật thông tin thành công');
-    } catch (e) {
-      Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
-    } finally {
+      Get.back();
       isLoading.value = false;
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
   }
 
   Future<void> deleteEmployee(UserModel employee) async {
+
     isLoading.value = true;
 
     try {
       await _userRepository.deleteEmployee(employee);
-      Get.snackbar('Thành công', 'Đã xóa nhân viên ${employee.name}');
+      Get.back();
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -152,11 +152,8 @@ class HRDashboardController extends GetxController {
     }
 
     try {
-      // tạo task mới
       await _userTaskRepository.createCustomUserTask(userId, taskName, hrUser.id);
-      // fetch lại danh sách tasks để cập nhật UI
-      loadEmployeeTasks(userId);
-      Get.snackbar('Thành công', 'Đã thêm task riêng');
+      Get.back();
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
@@ -171,18 +168,7 @@ class HRDashboardController extends GetxController {
     try {
       final updatedTask = task.copyWith(name: newName);
       await _taskRepository.updateTask(updatedTask);
-
-      // cập nhật list hiện tại
-      final index = userTasks.indexWhere((t) => t.task.id == task.id);
-      if (index != -1) {
-        userTasks[index] = TaskWithUserTask(
-          task: updatedTask,
-          userTask: userTasks[index].userTask,
-        );
-        userTasks.refresh();
-      }
-
-      Get.snackbar('Thành công', 'Đã cập nhật task');
+      Get.back();
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
@@ -191,14 +177,11 @@ class HRDashboardController extends GetxController {
   Future<void> deleteCustomTask(String taskId, String userId) async {
     try {
       await _taskRepository.deleteCustomTaskForUser(taskId, userId);
-      userTasks.removeWhere((t) => t.task.id == taskId);
-      Get.snackbar('Thành công', 'Đã xóa task');
+      Get.back();
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
   }
-
-
   void navigateToTaskManagement() {
     Get.toNamed(RouteConstants.taskManagement, arguments: hrUser);
   }

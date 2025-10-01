@@ -441,7 +441,7 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
               child: Icon(Icons.person_add, color: Colors.white, size: 20.sp),
             ),
             SizedBox(width: 12.w),
-            const Text('Thêm nhân viên mới'),
+            const Text('Thêm nhân viên'),
           ],
         ),
         content: Column(
@@ -482,6 +482,9 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black87,
+            ),
             child: const Text('Hủy'),
           ),
           Obx(() => ElevatedButton(
@@ -489,7 +492,6 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
                 ? null
                 : () {
               controller.addEmployee(nameController.text, emailController.text);
-              Get.back();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF26C6DA),
@@ -571,6 +573,9 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black87,
+            ),
             child: const Text('Hủy'),
           ),
           Obx(() => ElevatedButton(
@@ -578,7 +583,6 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
                 ? null
                 : () {
               controller.updateEmployee(employee.id, nameController.text, emailController.text);
-              Get.back();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF26C6DA),
@@ -625,15 +629,18 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black87,
+            ),
             child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: () {
               controller.deleteEmployee(employee);
-              Get.back();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
             ),
             child: const Text('Xóa'),
