@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:onboardingapp/presentation/login/login_controller.dart';
 import 'package:onboardingapp/presentation/login/widgets/role_selection_card.dart';
 import 'package:onboardingapp/presentation/login/widgets/login_form.dart';
+import '../../core/constants/route_constants.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
@@ -114,6 +114,9 @@ class LoginScreen extends GetView<LoginController> {
           children: [
             Obx(() => LoginForm(
               onEmailChanged: controller.updateEmail,
+              onPasswordChanged: controller.updatePassword,
+              onTogglePassword: controller.togglePasswordVisibility,
+              isPasswordVisible: controller.isPasswordVisible.value,
               isLoading: controller.isLoading.value,
               errorMessage: controller.loginError.value,
             )),
@@ -123,7 +126,22 @@ class LoginScreen extends GetView<LoginController> {
               onRoleChanged: controller.updateRole,
               enabled: !controller.isLoading.value,
             )),
-            SizedBox(height: 20.h),
+            SizedBox(height: 12.h),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Get.toNamed(RouteConstants.forgotPassword),
+                child: Text(
+                  'Quên mật khẩu?',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: const Color(0xFF26C6DA),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
             Obx(() => controller.loginError.isNotEmpty
                 ? _buildErrorMessage()
                 : const SizedBox.shrink()),
@@ -212,18 +230,24 @@ class LoginScreen extends GetView<LoginController> {
     return Obx(() => Container(
       height: 52.h,
       decoration: BoxDecoration(
-        gradient: controller.isLoading.value || controller.userEmail.isEmpty
+        gradient: controller.isLoading.value ||
+            controller.userEmail.isEmpty ||
+            controller.userPassword.isEmpty
             ? null
             : const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
         ),
-        color: controller.isLoading.value || controller.userEmail.isEmpty
+        color: controller.isLoading.value ||
+            controller.userEmail.isEmpty ||
+            controller.userPassword.isEmpty
             ? Colors.grey[300]
             : null,
         borderRadius: BorderRadius.circular(12.r),
-        boxShadow: controller.isLoading.value || controller.userEmail.isEmpty
+        boxShadow: controller.isLoading.value ||
+            controller.userEmail.isEmpty ||
+            controller.userPassword.isEmpty
             ? null
             : [
           BoxShadow(
@@ -234,7 +258,9 @@ class LoginScreen extends GetView<LoginController> {
         ],
       ),
       child: ElevatedButton(
-        onPressed: controller.isLoading.value || controller.userEmail.isEmpty
+        onPressed: controller.isLoading.value ||
+            controller.userEmail.isEmpty ||
+            controller.userPassword.isEmpty
             ? null
             : controller.login,
         style: ElevatedButton.styleFrom(
@@ -252,9 +278,7 @@ class LoginScreen extends GetView<LoginController> {
               SizedBox(width: 10.w),
             ],
             Text(
-              controller.isLoading.value
-                  ? 'Đang đăng nhập...'
-                  : 'Đăng nhập',
+              controller.isLoading.value ? 'Đang đăng nhập...' : 'Đăng nhập',
               style: TextStyle(
                 fontSize: 16.sp,
                 fontWeight: FontWeight.bold,

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get/get.dart';
 import 'package:onboardingapp/data/models/task_model.dart';
@@ -11,11 +12,15 @@ import '../../core/utils/date_utils.dart';
 class UserRepository extends GetxService {
   final FirebaseService _firebaseService = Get.find();
 
-  // Authenticate user
-  Future<UserModel?> authenticateUser(String email, String role) async {
+  // Authenticate user with password
+  Future<UserModel?> authenticateUser(String email, String password, String role) async {
     try {
       if (!ValidationUtils.isValidEmail(email)) {
         throw Exception('Email không hợp lệ');
+      }
+
+      if (password.isEmpty) {
+        throw Exception('Vui lòng nhập mật khẩu');
       }
 
       final userId = ValidationUtils.sanitizeEmailForFirebase(email);
@@ -24,6 +29,10 @@ class UserRepository extends GetxService {
       if (snapshot.exists) {
         final userData = snapshot.value as Map<dynamic, dynamic>;
         final user = UserModel.fromMap(Map<String, dynamic>.from(userData));
+
+        if (user.password != password) {
+          throw Exception('Mật khẩu không đúng');
+        }
 
         if (user.role == role) {
           return user;
@@ -37,6 +46,42 @@ class UserRepository extends GetxService {
       if (e is Exception) rethrow;
       throw Exception('Lỗi kết nối: ${e.toString()}');
     }
+  }
+
+  // Reset password - generate random password
+  Future<String> resetPassword(String email) async {
+    try {
+      if (!ValidationUtils.isValidEmail(email)) {
+        throw Exception('Email không hợp lệ');
+      }
+
+      final userId = ValidationUtils.sanitizeEmailForFirebase(email);
+      final snapshot = await _firebaseService.getUserRef(userId).get();
+
+      if (!snapshot.exists) {
+        throw Exception('Email không tồn tại trong hệ thống');
+      }
+
+      final userData = snapshot.value as Map<dynamic, dynamic>;
+      final user = UserModel.fromMap(Map<String, dynamic>.from(userData));
+
+      // Generate random 8-character password
+      final newPassword = _generateRandomPassword();
+
+      final updatedUser = user.copyWith(password: newPassword);
+      await saveUser(updatedUser);
+
+      return newPassword;
+    } catch (e) {
+      if (e is Exception) rethrow;
+      throw Exception('Lỗi reset password: ${e.toString()}');
+    }
+  }
+
+  String _generateRandomPassword() {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final random = Random();
+    return List.generate(8, (index) => chars[random.nextInt(chars.length)]).join();
   }
 
   // Get employees stream
@@ -67,8 +112,8 @@ class UserRepository extends GetxService {
     }
   }
 
-  // Create employee
-  Future<UserModel> createEmployee(String name, String email) async {
+  // Create employee with custom password
+  Future<UserModel> createEmployee(String name, String email, String password) async {
     try {
       if (!ValidationUtils.isValidName(name)) {
         throw Exception('Tên không hợp lệ');
@@ -84,6 +129,7 @@ class UserRepository extends GetxService {
         email: email.toLowerCase().trim(),
         role: AppConstants.roleEmployee,
         startDate: AppDateUtils.getCurrentDate(),
+        password: password.isEmpty ? '123456' : password,
       );
 
       await saveUser(newEmployee);
@@ -105,7 +151,6 @@ class UserRepository extends GetxService {
       }
 
       if (oldId != updatedEmployee.id) {
-        // Handle ID change - need to migrate user tasks
         final taskSnapshot = await _firebaseService
             .getUserTasksRef()
             .child(oldId)
@@ -148,8 +193,6 @@ class UserRepository extends GetxService {
       };
 
       await _firebaseService.database.update(updates);
-
-      // Also delete custom tasks created for this employee
       await _deleteCustomTasksForUser(employee.id);
     } catch (e) {
       throw Exception('Lỗi xóa nhân viên: ${e.toString()}');
@@ -180,7 +223,7 @@ class UserRepository extends GetxService {
         }
       }
     } catch (e) {
-      // Log error but don't fail the main operation
+      // Log error but don't fail main operation
     }
   }
 }

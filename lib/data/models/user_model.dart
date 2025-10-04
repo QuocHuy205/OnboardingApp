@@ -4,6 +4,7 @@ class UserModel {
   final String email;
   final String role;
   final String startDate;
+  final String password;
 
   UserModel({
     required this.id,
@@ -11,6 +12,7 @@ class UserModel {
     required this.email,
     required this.role,
     required this.startDate,
+    required this.password,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -20,6 +22,7 @@ class UserModel {
       email: map['email'] ?? '',
       role: map['role'] ?? 'employee',
       startDate: map['startDate'] ?? '',
+      password: map['password'] ?? '123456',
     );
   }
 
@@ -30,6 +33,7 @@ class UserModel {
       'email': email,
       'role': role,
       'startDate': startDate,
+      'password': password,
     };
   }
 
@@ -39,6 +43,7 @@ class UserModel {
     String? email,
     String? role,
     String? startDate,
+    String? password,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -46,6 +51,7 @@ class UserModel {
       email: email ?? this.email,
       role: role ?? this.role,
       startDate: startDate ?? this.startDate,
+      password: password ?? this.password,
     );
   }
 
@@ -57,7 +63,8 @@ class UserModel {
         other.name == name &&
         other.email == email &&
         other.role == role &&
-        other.startDate == startDate;
+        other.startDate == startDate &&
+        other.password == password;
   }
 
   @override
@@ -66,6 +73,7 @@ class UserModel {
     name.hashCode ^
     email.hashCode ^
     role.hashCode ^
-    startDate.hashCode;
+    startDate.hashCode ^
+    password.hashCode;
   }
 }

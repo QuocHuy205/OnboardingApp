@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../core/constants/route_constants.dart';
 import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
 import '../../core/utils/extensions.dart';
@@ -13,12 +14,12 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: const Color(0xFFF5F9FA),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(120.h),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [Color(0xFF4DD0E1), Color(0xFF26C6DA)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -28,9 +29,9 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black26,
-                blurRadius: 6,
-                offset: const Offset(0, 3),
+                color: const Color(0xFF26C6DA).withOpacity(0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -40,29 +41,60 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  // Avatar
                   CircleAvatar(
                     radius: 26.r,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, color: Colors.lightBlue.shade700, size: 28),
+                    child: Text(
+                      controller.user.name.isNotEmpty
+                          ? controller.user.name[0].toUpperCase()
+                          : 'E',
+                      style: TextStyle(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF26C6DA),
+                      ),
+                    ),
                   ),
                   SizedBox(width: 12.w),
+
+                  // User name
                   Expanded(
                     child: Text(
                       "Xin chào, ${controller.user.name}",
-                      style: AppTextStyles.heading2.copyWith(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 22.sp,
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   SizedBox(width: 8.w),
+
+                  // Đổi mật khẩu button
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: IconButton(
+                      onPressed: () => Get.toNamed(
+                        RouteConstants.changePassword,
+                        arguments: controller.user,
+                      ),
+                      icon: const Icon(Icons.lock_reset, color: Colors.white),
+                      tooltip: 'Đổi mật khẩu',
+                    ),
+                  ),
+                  SizedBox(width: 4.w),
+
+                  // Logout button
                   ElevatedButton.icon(
                     onPressed: controller.logout,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.lightBlue.shade700,
+                      foregroundColor: const Color(0xFF26C6DA),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.r),
                       ),
@@ -72,7 +104,8 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
                     icon: const Icon(Icons.logout, size: 18),
                     label: Text(
                       "Đăng xuất",
-                      style: AppTextStyles.bodySmall.copyWith(
+                      style: TextStyle(
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -83,7 +116,6 @@ class EmployeeDashboardScreen extends GetView<EmployeeDashboardController> {
           ),
         ),
       ),
-
       body: Obx(
             () => controller.userTasks.isEmpty
             ? _buildLoadingState()

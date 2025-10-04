@@ -1,6 +1,10 @@
 import 'package:get/get.dart';
+import '../../presentation/change_passworđ/change_password_controller.dart';
+import '../../presentation/change_passworđ/change_password_screen.dart';
 import '../../presentation/login/login_screen.dart';
-import '../../presentation/login/login_controller.dart'; // THÊM IMPORT NÀY
+import '../../presentation/login/login_controller.dart';
+import '../../presentation/forgot_password/forgot_password_screen.dart';
+import '../../presentation/forgot_password/forgot_password_controller.dart';
 import '../../presentation/hr_dashboard/hr_dashboard_screen.dart';
 import '../../presentation/hr_dashboard/hr_dashboard_controller.dart';
 import '../../presentation/employee_dashboard/employee_dashboard_screen.dart';
@@ -16,6 +20,20 @@ class AppRoutes {
       page: () => const LoginScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut(() => LoginController());
+      }),
+    ),
+    GetPage(
+      name: RouteConstants.forgotPassword,
+      page: () => const ForgotPasswordScreen(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ForgotPasswordController());
+      }),
+    ),
+    GetPage(
+      name: RouteConstants.changePassword,
+      page: () => const ChangePasswordScreen(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ChangePasswordController());
       }),
     ),
     GetPage(

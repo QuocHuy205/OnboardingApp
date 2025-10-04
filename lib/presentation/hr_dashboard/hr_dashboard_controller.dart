@@ -22,7 +22,6 @@ class HRDashboardController extends GetxController {
 
   final userTasks = <TaskWithUserTask>[].obs;
   StreamSubscription<List<TaskWithUserTask>>? _tasksSubscription;
-
   StreamSubscription<List<UserModel>>? _employeesSubscription;
 
   @override
@@ -87,7 +86,8 @@ class HRDashboardController extends GetxController {
     }
   }
 
-  Future<void> addEmployee(String name, String email) async {
+  // THÊM PASSWORD PARAMETER
+  Future<void> addEmployee(String name, String email, String password) async {
     if (name.isEmpty || email.isEmpty) {
       Get.snackbar('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
       return;
@@ -96,10 +96,12 @@ class HRDashboardController extends GetxController {
     isLoading.value = true;
 
     try {
-      final newEmployee = await _userRepository.createEmployee(name, email);
+      final newEmployee = await _userRepository.createEmployee(name, email, password);
       await _userTaskRepository.createUserTasks(newEmployee.id);
-      Get.back();
+
       isLoading.value = false;
+      Get.back();
+      Get.snackbar('Thành công', 'Thêm nhân viên thành công');
     } catch (e) {
       isLoading.value = false;
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
@@ -123,8 +125,10 @@ class HRDashboardController extends GetxController {
       );
 
       await _userRepository.updateEmployee(oldId, updatedEmployee);
-      Get.back();
+
       isLoading.value = false;
+      Get.back();
+      Get.snackbar('Thành công', 'Cập nhật thông tin thành công');
     } catch (e) {
       isLoading.value = false;
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
@@ -132,12 +136,13 @@ class HRDashboardController extends GetxController {
   }
 
   Future<void> deleteEmployee(UserModel employee) async {
+    Get.back(); // Đóng dialog xác nhận ngay
 
     isLoading.value = true;
 
     try {
       await _userRepository.deleteEmployee(employee);
-      Get.back();
+      Get.snackbar('Thành công', 'Đã xóa nhân viên ${employee.name}');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -153,7 +158,9 @@ class HRDashboardController extends GetxController {
 
     try {
       await _userTaskRepository.createCustomUserTask(userId, taskName, hrUser.id);
+
       Get.back();
+      Get.snackbar('Thành công', 'Đã thêm task riêng');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
@@ -168,20 +175,25 @@ class HRDashboardController extends GetxController {
     try {
       final updatedTask = task.copyWith(name: newName);
       await _taskRepository.updateTask(updatedTask);
+
       Get.back();
+      Get.snackbar('Thành công', 'Đã cập nhật task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
   }
 
   Future<void> deleteCustomTask(String taskId, String userId) async {
+    Get.back(); // Đóng dialog xác nhận ngay
+
     try {
       await _taskRepository.deleteCustomTaskForUser(taskId, userId);
-      Get.back();
+      Get.snackbar('Thành công', 'Đã xóa task');
     } catch (e) {
       Get.snackbar('Lỗi', e.toString().replaceAll('Exception: ', ''));
     }
   }
+
   void navigateToTaskManagement() {
     Get.toNamed(RouteConstants.taskManagement, arguments: hrUser);
   }

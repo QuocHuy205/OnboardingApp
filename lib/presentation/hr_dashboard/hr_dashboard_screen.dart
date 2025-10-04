@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../core/constants/route_constants.dart';
 import 'hr_dashboard_controller.dart';
 import 'widgets/employee_card.dart';
 import 'widgets/employee_progress_dialog.dart';
@@ -97,26 +98,49 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
             tooltip: 'Quản lý Tasks',
           ),
         ),
-        Container(
-          margin: EdgeInsets.only(right: 12.w, top: 8.h, bottom: 8.h),
-          child: OutlinedButton.icon(
-            onPressed: controller.logout,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: const BorderSide(color: Colors.white, width: 1.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            ),
-            icon: const Icon(Icons.logout, size: 18),
-            label: const Text('Đăng xuất'),
+        // THÊM POPUP MENU
+        PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert, color: Colors.white),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
           ),
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'change_password',
+              child: Row(
+                children: [
+                  Icon(Icons.lock_reset, color: Color(0xFF26C6DA), size: 20.sp),
+                  SizedBox(width: 12.w),
+                  Text('Đổi mật khẩu'),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'logout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout, color: Colors.red[400], size: 20.sp),
+                  SizedBox(width: 12.w),
+                  Text('Đăng xuất', style: TextStyle(color: Colors.red[400])),
+                ],
+              ),
+            ),
+          ],
+          onSelected: (value) {
+            if (value == 'change_password') {
+              Get.toNamed(
+                RouteConstants.changePassword,
+                arguments: controller.hrUser,
+              );
+            } else if (value == 'logout') {
+              controller.logout();
+            }
+          },
         ),
+        SizedBox(width: 8.w),
       ],
     );
   }
-
 
   Widget _buildHeaderCard() {
     return Container(
@@ -423,6 +447,7 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
   void _showAddEmployeeDialog(BuildContext context) {
     final nameController = TextEditingController();
     final emailController = TextEditingController();
+    final passwordController = TextEditingController(); // THÊM
 
     showDialog(
       context: context,
@@ -477,21 +502,41 @@ class HRDashboardScreen extends GetView<HRDashboardController> {
               ),
               keyboardType: TextInputType.emailAddress,
             ),
+            SizedBox(height: 16.h),
+            // THÊM PASSWORD FIELD
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(
+                labelText: 'Mật khẩu (để trống = 123456)',
+                prefixIcon: const Icon(Icons.lock, color: Color(0xFF26C6DA)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.r),
+                  borderSide: const BorderSide(color: Color(0xFF26C6DA), width: 2),
+                ),
+              ),
+              obscureText: true,
+            ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.black87,
-            ),
+            style: TextButton.styleFrom(foregroundColor: Colors.black87),
             child: const Text('Hủy'),
           ),
           Obx(() => ElevatedButton(
             onPressed: controller.isLoading.value
                 ? null
                 : () {
-              controller.addEmployee(nameController.text, emailController.text);
+              // THÊM PASSWORD VÀO ĐÂY
+              controller.addEmployee(
+                nameController.text,
+                emailController.text,
+                passwordController.text,
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF26C6DA),
